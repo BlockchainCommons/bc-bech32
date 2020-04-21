@@ -51,7 +51,7 @@ int segwit_addr_encode(
  *                 contain the witness program bytes.
  *       prog_len: Pointer to a size_t that will be updated to contain the length
  *                 of bytes in prog.
- *       hrp:      Pointer to the null-terminated human readable part that is
+ *  In:  hrp:      Pointer to the null-terminated human readable part that is
  *                 expected (chain/network specific).
  *       addr:     Pointer to the null-terminated address.
  *  Returns 1 if successful.

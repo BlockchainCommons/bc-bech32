@@ -49,6 +49,7 @@ This table below also establishes provenance (repository of origin, permalink, a
 | --------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------ | ----------------------------------------------------------- |
 | segwith_addr.h | [https://github.com/sipa/bech32](https://github.com/sipa/bech32) | [52b5a0f](https://github.com/sipa/bech32/commit/52b5a0fa6d3174c4150393fb7d6b58d34b4f5e0b#diff-e41fa0689fedfaab3c4cdcc018ca67cb) | 2017 [Pieter Wuille](https://github.com/sipa)  | [MIT](https://spdx.org/licenses/MIT)                        |
 | segwith_addr.c | [https://github.com/sipa/bech32](https://github.com/sipa/bech32) | [2b0aac6](https://github.com/sipa/bech32/commit/2b0aac650ce560fb2b2a2bebeacaa5c87d7e5938) | 2017-2018 [Pieter Wuille](https://github.com/sipa)<br/>2017 [Daniel Cousens](https://github.com/dcousens)  | [MIT](https://spdx.org/licenses/MIT)                        |
+| test.c | [https://github.com/sipa/bech32](https://github.com/sipa/bech32) | [2b0aac6](https://github.com/sipa/bech32/commit/2b0aac650ce560fb2b2a2bebeacaa5c87d7e5938) | 2017-2018 [Pieter Wuille](https://github.com/sipa)  | [MIT](https://spdx.org/licenses/MIT)                        |
 
 ### Dependencies
 
