@@ -117,6 +117,29 @@ static struct invalid_address_data invalid_address_enc[] = {
     {"bc", 16, 41},
 };
 
+struct valid_seed_data {
+    const char* encoded_seed;
+    size_t seed_len;
+    const uint8_t seed[64];
+};
+
+static struct valid_seed_data valid_seed[] = {
+    {
+        "seed1chl9xyj538m0tsjglhpnf4a6nfdphnn9nc4w4ulq5gfv8eppvftl6ew3wez55hean67urzgq95tyrval5q3wal8h9acdjr6lwc7rrwqa07zt8",
+        64,
+        {
+            0xc5, 0xfe, 0x53, 0x12, 0x54, 0x89, 0xf6, 0xf5,
+            0xc2, 0x48, 0xfd, 0xc3, 0x34, 0xd7, 0xba, 0x9a, 
+            0x5a, 0x1b, 0xce, 0x65, 0x9e, 0x2a, 0xea, 0xf3, 
+            0xe0, 0xa2, 0x12, 0xc3, 0xe4, 0x21, 0x62, 0x57, 
+            0xfd, 0x65, 0xd1, 0x76, 0x45, 0x4a, 0x5f, 0x3d, 
+            0x9e, 0xbd, 0xc1, 0x89, 0x00, 0x2d, 0x16, 0x41, 
+            0xb3, 0xbf, 0xa0, 0x22, 0xee, 0xfc, 0xf7, 0x2f,
+            0x70, 0xd9, 0x0f, 0x5f, 0x76, 0x3c, 0x31, 0xb8
+        }
+    }
+};
+
 static void segwit_scriptpubkey(uint8_t* scriptpubkey, size_t* scriptpubkeylen, int witver, const uint8_t* witprog, size_t witprog_len) {
     scriptpubkey[0] = witver ? (0x50 + witver) : 0;
     scriptpubkey[1] = witprog_len;
@@ -229,6 +252,33 @@ int main(void) {
         if (segwit_addr_encode(rebuild, invalid_address_enc[i].hrp, invalid_address_enc[i].version, program, invalid_address_enc[i].program_length)) {
             printf("segwit_addr_encode succeeds on invalid input '%s'\n", rebuild);
             ++fail;
+        }
+    }
+    for (i = 0; i < sizeof(valid_seed) / sizeof(valid_seed[0]); ++i) {
+        char output[120];
+        bool ok = true;
+        if(ok && !bech32_seed_encode(output, valid_seed[i].seed, valid_seed[i].seed_len)) {
+            printf("seed encode fails.\n");
+            ok = false;
+        }
+        //printf("seed: \"%s\"\n", output);
+        if(ok && strcmp(output, valid_seed[i].encoded_seed) != 0) {
+            printf("seed encode doesn't match.\n");
+            ok = false;
+        }
+        
+        uint8_t rebuild[70];
+        size_t seed_len;
+        if(ok && !bech32_seed_decode(rebuild, &seed_len, valid_seed[i].encoded_seed)) {
+            printf("seed decode fails.\n");
+            ok = false;
+        }
+        if(ok && !equal_uint8_buffers(rebuild, seed_len, valid_seed[i].seed, valid_seed[i].seed_len)) {
+            printf("seed decode doesn't match.\n");
+            ok = false;
+        }
+        if (!ok) {
+            fail++;
         }
     }
     if(fail > 0) {
