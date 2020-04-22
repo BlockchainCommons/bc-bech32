@@ -47,7 +47,7 @@ static const int8_t charset_rev[128] = {
      1,  0,  3, 16, 11, 28, 12, 14,  6,  4,  2, -1, -1, -1, -1, -1
 };
 
-static int _bech32_encode(char *output, const char *hrp, const uint8_t *data, size_t data_len, size_t max_output_len) {
+static int _bech32_encode(char *output, const char *hrp, const uint8_t *data, size_t data_len, bech32_version version, size_t max_output_len) {
     uint32_t chk = 1;
     size_t i = 0;
     while (hrp[i] != 0) {
@@ -75,7 +75,16 @@ static int _bech32_encode(char *output, const char *hrp, const uint8_t *data, si
     for (i = 0; i < 6; ++i) {
         chk = bech32_polymod_step(chk);
     }
-    chk ^= 1;
+    switch (version) {
+        case version_bech32:
+            chk ^= 1;
+            break;
+        case version_bech32_bis:
+            chk ^= 0x3fffffff;
+            break;
+        default:
+            return 0;
+    }
     for (i = 0; i < 6; ++i) {
         *(output++) = charset[(chk >> ((5 - i) * 5)) & 0x1f];
     }
@@ -83,11 +92,11 @@ static int _bech32_encode(char *output, const char *hrp, const uint8_t *data, si
     return 1;
 }
 
-int bech32_encode(char *output, const char *hrp, const uint8_t *data, size_t data_len) {
-    return _bech32_encode(output, hrp, data, data_len, 90);
+int bech32_encode(char *output, const char *hrp, const uint8_t *data, size_t data_len, bech32_version version) {
+    return _bech32_encode(output, hrp, data, data_len, version, 90);
 }
 
-static int _bech32_decode(char* hrp, uint8_t *data, size_t *data_len, const char *input, size_t max_input_len) {
+static int _bech32_decode(char* hrp, uint8_t *data, size_t *data_len, const char *input, bech32_version version, size_t max_input_len) {
     uint32_t chk = 1;
     size_t i;
     size_t input_len = strlen(input);
@@ -141,11 +150,20 @@ static int _bech32_decode(char* hrp, uint8_t *data, size_t *data_len, const char
     if (have_lower && have_upper) {
         return 0;
     }
-    return chk == 1;
+    switch (version) {
+        case version_bech32:
+            return chk == 1;
+            break;
+        case version_bech32_bis:
+            return chk == 0x3fffffff;
+            break;
+        default:
+            return 0;
+    }
 }
 
-int bech32_decode(char* hrp, uint8_t *data, size_t *data_len, const char *input) {
-    return _bech32_decode(hrp, data, data_len, input, 90);
+int bech32_decode(char* hrp, uint8_t *data, size_t *data_len, const char *input, bech32_version version) {
+    return _bech32_decode(hrp, data, data_len, input, version, 90);
 }
 
 static int convert_bits(uint8_t* out, size_t* outlen, int outbits, const uint8_t* in, size_t inlen, int inbits, int pad) {
@@ -170,7 +188,7 @@ static int convert_bits(uint8_t* out, size_t* outlen, int outbits, const uint8_t
     return 1;
 }
 
-int segwit_addr_encode(char *output, const char *hrp, int witver, const uint8_t *witprog, size_t witprog_len) {
+int segwit_addr_encode(char *output, const char *hrp, int witver, const uint8_t *witprog, size_t witprog_len, bech32_version version) {
     uint8_t data[65];
     size_t datalen = 0;
     if (witver > 16) return 0;
@@ -179,14 +197,14 @@ int segwit_addr_encode(char *output, const char *hrp, int witver, const uint8_t 
     data[0] = witver;
     convert_bits(data + 1, &datalen, 5, witprog, witprog_len, 8, 1);
     ++datalen;
-    return bech32_encode(output, hrp, data, datalen);
+    return bech32_encode(output, hrp, data, datalen, version);
 }
 
-int segwit_addr_decode(int* witver, uint8_t* witdata, size_t* witdata_len, const char* hrp, const char* addr) {
+int segwit_addr_decode(int* witver, uint8_t* witdata, size_t* witdata_len, const char* hrp, const char* addr, bech32_version version) {
     uint8_t data[84];
     char hrp_actual[84];
     size_t data_len;
-    if (!bech32_decode(hrp_actual, data, &data_len, addr)) return 0;
+    if (!bech32_decode(hrp_actual, data, &data_len, addr, version)) return 0;
     if (data_len == 0 || data_len > 65) return 0;
     if (strncmp(hrp, hrp_actual, 84) != 0) return 0;
     if (data[0] > 16) return 0;
@@ -203,14 +221,14 @@ int bech32_seed_encode(char* output, const uint8_t *seed, size_t seed_len) {
     size_t data_len = 0;
     if(seed_len < 1 || seed_len > 64) return 0;
     convert_bits(data, &data_len, 5, seed, seed_len, 8, 1);
-    return _bech32_encode(output, "seed", data, data_len, 114);
+    return _bech32_encode(output, "seed", data, data_len, version_bech32_bis, 114);
 }
 
 int bech32_seed_decode(uint8_t* seed, size_t* seed_len, const char* input) {
     uint8_t data[200];
     char hrp_actual[200];
     size_t data_len;
-    if (!_bech32_decode(hrp_actual, data, &data_len, input, 114)) return 0;
+    if (!_bech32_decode(hrp_actual, data, &data_len, input, version_bech32_bis, 114)) return 0;
     if (data_len == 0 || data_len > 103) return 0;
     if (strncmp("seed", hrp_actual, 200) != 0) return 0;
     *seed_len = 0;

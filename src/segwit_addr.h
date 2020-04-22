@@ -24,6 +24,11 @@
 
 #include <stdint.h>
 
+typedef enum bech32_version_t {
+    version_bech32,
+    version_bech32_bis
+} bech32_version;
+
 /** Encode a SegWit address
  *
  *  Out: output:   Pointer to a buffer of size 73 + strlen(hrp) that will be
@@ -33,6 +38,7 @@
  *       ver:      Version of the witness program (between 0 and 16 inclusive).
  *       prog:     Data bytes for the witness program (between 2 and 40 bytes).
  *       prog_len: Number of data bytes in prog.
+ *       version:  The version of the Bech32 algorithm to use.
  *  Returns 1 if successful.
  */
 int segwit_addr_encode(
@@ -40,7 +46,8 @@ int segwit_addr_encode(
     const char *hrp,
     int ver,
     const uint8_t *prog,
-    size_t prog_len
+    size_t prog_len,
+    bech32_version version
 );
 
 /** Decode a SegWit address
@@ -61,7 +68,8 @@ int segwit_addr_decode(
     uint8_t* prog,
     size_t* prog_len,
     const char* hrp,
-    const char* addr
+    const char* addr,
+    bech32_version version
 );
 
 /** Encode a Bech32 string
@@ -77,7 +85,8 @@ int bech32_encode(
     char *output,
     const char *hrp,
     const uint8_t *data,
-    size_t data_len
+    size_t data_len,
+    bech32_version version
 );
 
 /** Decode a Bech32 string
@@ -95,7 +104,8 @@ int bech32_decode(
     char *hrp,
     uint8_t *data,
     size_t *data_len,
-    const char *input
+    const char *input,
+    bech32_version version
 );
 
 /** Encode an arbitrary seed in Bech32 format
@@ -107,7 +117,11 @@ int bech32_decode(
  *
  * Returns 1 if successful.
  */
-int bech32_seed_encode(char* output, const uint8_t *seed, size_t seed_len);
+int bech32_seed_encode(
+    char* output, 
+    const uint8_t *seed, 
+    size_t seed_len
+);
 
 /** Decode a Bech32 seed
  * Out: seed:     Pointer to a buffer of size 64 that will be updated to 
@@ -117,6 +131,10 @@ int bech32_seed_encode(char* output, const uint8_t *seed, size_t seed_len);
  * 
  * Returns 1 if successful.
  */
-int bech32_seed_decode(uint8_t* seed, size_t* seed_len, const char* input);
+int bech32_seed_decode(
+    uint8_t* seed, 
+    size_t* seed_len, 
+    const char* input
+);
 
 #endif

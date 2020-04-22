@@ -125,7 +125,7 @@ struct valid_seed_data {
 
 static struct valid_seed_data valid_seed[] = {
     {
-        "seed1chl9xyj538m0tsjglhpnf4a6nfdphnn9nc4w4ulq5gfv8eppvftl6ew3wez55hean67urzgq95tyrval5q3wal8h9acdjr6lwc7rrwqa07zt8",
+        "seed1chl9xyj538m0tsjglhpnf4a6nfdphnn9nc4w4ulq5gfv8eppvftl6ew3wez55hean67urzgq95tyrval5q3wal8h9acdjr6lwc7rrwqzspa5e",
         64,
         {
             0xc5, 0xfe, 0x53, 0x12, 0x54, 0x89, 0xf6, 0xf5,
@@ -171,12 +171,12 @@ int main(void) {
         char hrp[84];
         size_t data_len;
         int ok = 1;
-        if (!bech32_decode(hrp, data, &data_len, valid_checksum[i])) {
+        if (!bech32_decode(hrp, data, &data_len, valid_checksum[i], version_bech32)) {
             printf("bech32_decode fails: '%s'\n", valid_checksum[i]);
             ok = 0;
         }
         if (ok) {
-            if (!bech32_encode(rebuild, hrp, data, data_len)) {
+            if (!bech32_encode(rebuild, hrp, data, data_len, version_bech32)) {
                 printf("bech32_encode fails: '%s'\n", valid_checksum[i]);
                 ok = 0;
             }
@@ -192,7 +192,7 @@ int main(void) {
         char hrp[84];
         size_t data_len;
         int ok = 1;
-        if (bech32_decode(hrp, data, &data_len, invalid_checksum[i])) {
+        if (bech32_decode(hrp, data, &data_len, invalid_checksum[i], version_bech32)) {
             printf("bech32_decode succeeds on invalid string: '%s'\n", invalid_checksum[i]);
             ok = 0;
         }
@@ -207,10 +207,10 @@ int main(void) {
         uint8_t scriptpubkey[42];
         size_t scriptpubkey_len;
         char rebuild[93];
-        int ret = segwit_addr_decode(&witver, witprog, &witprog_len, hrp, valid_address[i].address);
+        int ret = segwit_addr_decode(&witver, witprog, &witprog_len, hrp, valid_address[i].address, version_bech32);
         if (!ret) {
             hrp = "tb";
-            ret = segwit_addr_decode(&witver, witprog, &witprog_len, hrp, valid_address[i].address);
+            ret = segwit_addr_decode(&witver, witprog, &witprog_len, hrp, valid_address[i].address, version_bech32);
         }
         if (!ret) {
             printf("segwit_addr_decode fails: '%s'\n", valid_address[i].address);
@@ -221,7 +221,7 @@ int main(void) {
             printf("segwit_addr_decode produces wrong result: '%s'\n", valid_address[i].address);
             ok = 0;
         }
-        if (ok && !segwit_addr_encode(rebuild, hrp, witver, witprog, witprog_len)) {
+        if (ok && !segwit_addr_encode(rebuild, hrp, witver, witprog, witprog_len, version_bech32)) {
             printf("segwit_addr_encode fails: '%s'\n", valid_address[i].address);
             ok = 0;
         }
@@ -236,11 +236,11 @@ int main(void) {
         size_t witprog_len;
         int witver;
         int ok = 1;
-        if (segwit_addr_decode(&witver, witprog, &witprog_len, "bc", invalid_address[i])) {
+        if (segwit_addr_decode(&witver, witprog, &witprog_len, "bc", invalid_address[i], version_bech32)) {
             printf("segwit_addr_decode succeeds on invalid address '%s'\n", invalid_address[i]);
             ok = 0;
         }
-        if (segwit_addr_decode(&witver, witprog, &witprog_len, "tb", invalid_address[i])) {
+        if (segwit_addr_decode(&witver, witprog, &witprog_len, "tb", invalid_address[i], version_bech32)) {
             printf("segwit_addr_decode succeeds on invalid address '%s'\n", invalid_address[i]);
             ok = 0;
         }
@@ -249,7 +249,7 @@ int main(void) {
     for (i = 0; i < sizeof(invalid_address_enc) / sizeof(invalid_address_enc[0]); ++i) {
         char rebuild[93];
         static const uint8_t program[42] = {0};
-        if (segwit_addr_encode(rebuild, invalid_address_enc[i].hrp, invalid_address_enc[i].version, program, invalid_address_enc[i].program_length)) {
+        if (segwit_addr_encode(rebuild, invalid_address_enc[i].hrp, invalid_address_enc[i].version, program, invalid_address_enc[i].program_length, version_bech32)) {
             printf("segwit_addr_encode succeeds on invalid input '%s'\n", rebuild);
             ++fail;
         }
