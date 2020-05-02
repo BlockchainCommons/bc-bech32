@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([bc-bech32], [0.1])
+AC_INIT([bc-bech32], [0.2])
 AC_CONFIG_SRCDIR([src/segwit_addr.h])
 AC_CONFIG_HEADERS([config.h])
 
