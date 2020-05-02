@@ -125,7 +125,7 @@ struct valid_seed_data {
 
 static struct valid_seed_data valid_seed[] = {
     {
-        "seed1chl9xyj538m0tsjglhpnf4a6nfdphnn9nc4w4ulq5gfv8eppvftl6ew3wez55hean67urzgq95tyrval5q3wal8h9acdjr6lwc7rrwqzspa5e",
+        "chl9xyj538m0tsjglhpnf4a6nfdphnn9nc4w4ulq5gfv8eppvftl6ew3wez55hean67urzgq95tyrval5q3wal8h9acdjr6lwc7rrwqapat22",
         64,
         {
             0xc5, 0xfe, 0x53, 0x12, 0x54, 0x89, 0xf6, 0xf5,
@@ -257,7 +257,7 @@ int main(void) {
     for (i = 0; i < sizeof(valid_seed) / sizeof(valid_seed[0]); ++i) {
         char output[120];
         bool ok = true;
-        if(ok && !bech32_seed_encode(output, valid_seed[i].seed, valid_seed[i].seed_len)) {
+        if(ok && !bc32_seed_encode(output, valid_seed[i].seed, valid_seed[i].seed_len)) {
             printf("seed encode fails.\n");
             ok = false;
         }
@@ -269,7 +269,7 @@ int main(void) {
         
         uint8_t rebuild[70];
         size_t seed_len;
-        if(ok && !bech32_seed_decode(rebuild, &seed_len, valid_seed[i].encoded_seed)) {
+        if(ok && !bc32_seed_decode(rebuild, &seed_len, valid_seed[i].encoded_seed)) {
             printf("seed decode fails.\n");
             ok = false;
         }

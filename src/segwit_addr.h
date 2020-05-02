@@ -108,7 +108,7 @@ int bech32_decode(
     bech32_version version
 );
 
-/** Encode an arbitrary seed in Bech32 format
+/** Encode an arbitrary seed in BC32 format
  * 
  *  Out: output:  Pointer to a buffer of size strlen("seed") + data_len + 8 that
  *                will be updated to contain the null-terminated Bech32 string.
@@ -117,13 +117,13 @@ int bech32_decode(
  *
  * Returns 1 if successful.
  */
-int bech32_seed_encode(
+int bc32_seed_encode(
     char* output, 
     const uint8_t *seed, 
     size_t seed_len
 );
 
-/** Decode a Bech32 seed
+/** Decode a BC32 seed
  * Out: seed:     Pointer to a buffer of size 64 that will be updated to 
  *                contain the see.
  *      seed_len: Pointer to number of bytes in seed.
@@ -131,7 +131,7 @@ int bech32_seed_encode(
  * 
  * Returns 1 if successful.
  */
-int bech32_seed_decode(
+int bc32_seed_decode(
     uint8_t* seed, 
     size_t* seed_len, 
     const char* input
