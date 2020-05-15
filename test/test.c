@@ -296,6 +296,7 @@ int main(void) {
             printf("BC32 encode doesn't match.\n");
             ok = false;
         }
+        free(output);
 
         uint8_t* rebuild;
         size_t seed_len;
@@ -310,6 +311,7 @@ int main(void) {
             printf("seed decode doesn't match.\n");
             ok = false;
         }
+        free(rebuild);
 
         if(!ok) {
             fail++;
