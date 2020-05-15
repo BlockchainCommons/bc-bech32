@@ -114,6 +114,10 @@ You can import a key by running the following command with that individual’s f
 
 ## Version History
 
+### 0.3.0, 5/15/2020
+
+* Added encode_bc32() and decode_bc32() to encode and decode arbitrarily large byte strings as BC32.
+
 ### 0.2.0, 5/2/2020
 
 * Changed Bech32 seed encoding to BC32 by dropping "Seed" HRP and '1' divider.
