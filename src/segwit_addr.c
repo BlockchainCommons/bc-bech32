@@ -261,3 +261,28 @@ int bc32_seed_decode(uint8_t* seed, size_t* seed_len, const char* input) {
     if (!convert_bits(seed, seed_len, 8, data, data_len, 5, 0)) return 0;
     return 1;
 }
+
+char* bc32_encode(const uint8_t* input, size_t input_len) {
+    size_t init_data_len = input_len * 8 / 5 + 10;
+    uint8_t data[init_data_len];
+    size_t data_len = 0;
+    convert_bits(data, &data_len, 5, input, input_len, 8, 1);
+    char* output = malloc(data_len + 1);
+    _bech32_encode(output, NULL, data, data_len, version_bech32_bis, SIZE_MAX);
+    return output;
+}
+
+uint8_t* bc32_decode(size_t* output_len, const char* input) {
+    size_t input_len = strlen(input);
+    uint8_t data[input_len];
+    size_t data_len;
+    if(!_bech32_decode(NULL, data, &data_len, input, version_bech32_bis, SIZE_MAX)) return NULL;
+    *output_len = 0;
+    size_t init_output_len = input_len * 5 / 8 + 10;
+    uint8_t* output = malloc(init_output_len);
+    if(!convert_bits(output, output_len, 8, data, data_len, 5, 0)) {
+        free(output);
+        return NULL;
+    }
+    return output;
+}

@@ -124,6 +124,7 @@ int bc32_seed_encode(
 );
 
 /** Decode a BC32 seed
+ * 
  * Out: seed:     Pointer to a buffer of size 64 that will be updated to 
  *                contain the see.
  *      seed_len: Pointer to number of bytes in seed.
@@ -134,6 +135,32 @@ int bc32_seed_encode(
 int bc32_seed_decode(
     uint8_t* seed, 
     size_t* seed_len, 
+    const char* input
+);
+
+/** Encode an arbitrary byte string in BC32 format
+ * 
+ * In: input:      Pointer to input data.
+ *     input_len:  Length of input data.
+ * 
+ * Returns a pointer to a newly allocated string. Caller is response to free it.
+ * Returns NULL if unsuccessful.
+ */
+char* bc32_encode(
+    const uint8_t* input,
+    size_t input_len
+);
+
+/** Decode a BC32-encoded byte string
+ * 
+ * Out: output_len:  Length of the output data.
+ * In: input:        The input BC32-encoded string.
+ * 
+ * Returns a pointer to the newly allocated data. Caller is responsible to free it.
+ * Returns NULL if unsuccessful (invalid BC32 encoding or checksum).
+ */
+uint8_t* bc32_decode(
+    size_t* output_len,
     const char* input
 );
 

@@ -281,6 +281,40 @@ int main(void) {
             fail++;
         }
     }
+    for(i = 0; i < sizeof(valid_seed) / sizeof(valid_seed[0]); ++i) {
+        bool ok = true;
+        char* output;
+        if(ok) {
+            output = bc32_encode(valid_seed[i].seed, valid_seed[i].seed_len);
+            if(output == NULL) {
+                printf("BC32 encode fails.\n");
+                ok = false;
+            }
+        }
+        //printf("BC32: \"%s\"\n", output);
+        if(ok && strcmp(output, valid_seed[i].encoded_seed) != 0) {
+            printf("BC32 encode doesn't match.\n");
+            ok = false;
+        }
+
+        uint8_t* rebuild;
+        size_t seed_len;
+        if(ok) {
+            rebuild = bc32_decode(&seed_len, valid_seed[i].encoded_seed);
+            if(rebuild == NULL) {
+                printf("BC32 decode fails.\n");
+                ok = false;
+            }
+        }
+        if(ok && !equal_uint8_buffers(rebuild, seed_len, valid_seed[i].seed, valid_seed[i].seed_len)) {
+            printf("seed decode doesn't match.\n");
+            ok = false;
+        }
+
+        if(!ok) {
+            fail++;
+        }
+    }
     if(fail > 0) {
         printf("%i failures\n", fail);
     }
