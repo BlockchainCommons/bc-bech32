@@ -132,7 +132,7 @@ static int _bech32_decode(char* hrp, uint8_t *data, size_t *data_len, const char
         *data_len = input_len;
         hrp_len = 0;
     }
-    
+
     *(data_len) -= 6;
 
     if(hrp != NULL) {
@@ -267,7 +267,7 @@ char* bc32_encode(const uint8_t* input, size_t input_len) {
     uint8_t data[init_data_len];
     size_t data_len = 0;
     convert_bits(data, &data_len, 5, input, input_len, 8, 1);
-    char* output = malloc(data_len + 1);
+    char* output = malloc(data_len + 10);
     _bech32_encode(output, NULL, data, data_len, version_bech32_bis, SIZE_MAX);
     return output;
 }
