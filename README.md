@@ -1,4 +1,5 @@
 # Blockchain Commons bc-bech32
+### _by Wolf McNally and Christopher Allen_
 
 Implementation of BIP-173 "Base32 address format for native v0-16 witness outputs" standard for use in Blockchain Commons software projects.
 
